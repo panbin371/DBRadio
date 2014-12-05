@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "manager.h"
+#import <AVFoundation/AVFoundation.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,managerDelegate,AVAudioPlayerDelegate>
 
 
 @end
