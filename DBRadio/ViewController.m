@@ -42,8 +42,12 @@
     
 //    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
     
-    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
-    [thread start];
+//    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
+//    [thread start];
+    
+    NSInvocationOperation *opera = [[NSInvocationOperation alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
+    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
+    [queue addOperation:opera];
     
     self.progress.progress = 0;
     
