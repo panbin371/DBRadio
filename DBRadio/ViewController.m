@@ -38,13 +38,28 @@
 //        });
 //    });
 
-    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
+//    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
+    
+    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
+    
     
     self.progress.progress = 0;
     
     NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
     [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
     [self tableView:_musicTableView didSelectRowAtIndexPath:index];
+}
+
+- (void)downLoadImg
+{
+    UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
+    
+    [self performSelectorOnMainThread:@selector(refreshImg:) withObject:img waitUntilDone:NO];
+}
+
+- (void)refreshImg:(UIImage *)img
+{
+    _musicImage.image = img;
 }
 
 - (void)viewDidLoad
@@ -96,21 +111,27 @@
     }
     _musicRow = indexPath;
     _musicDic = [_musicInfo objectAtIndex:indexPath.row];
-    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
-    
+//    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
+    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
 //    _musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(time) userInfo:nil repeats:YES];
     self.progress.progress = 0;
     [[PlayMusic sharedPlay].player stop];
     [PlayMusic sharedPlay].delegate = self;
-    dispatch_queue_t serialQueue = dispatch_queue_create("MusicQueue", NULL);
-    dispatch_async(serialQueue,^{
-        //获取数据,获得一组后,刷新UI.
-        [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"]];
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            //UI的更新需在主线程中进行
-//        });
-    });
+    
+//    dispatch_queue_t serialQueue = dispatch_queue_create("MusicQueue", NULL);
+//    dispatch_async(serialQueue,^{
+//        //获取数据,获得一组后,刷新UI.
+//        [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"]];
+////        dispatch_async(dispatch_get_main_queue(), ^{
+////            //UI的更新需在主线程中进行
+////        });
+//    });
+    [self performSelectorInBackground:@selector(downLoadMic) withObject:nil];
+}
 
+- (void)downLoadMic
+{
+    [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"]];
 }
 
 -(void)musicInfo:(NSDictionary *)dic
