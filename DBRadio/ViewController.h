@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "manager.h"
+#import "PlayMusic.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,managerDelegate,AVAudioPlayerDelegate>
+@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,managerDelegate,AVAudioPlayerDelegate,PlayMusicDelegate>
 
 
 @end

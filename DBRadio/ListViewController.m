@@ -18,14 +18,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if (_managers == nil)
-    {
-        _managers = [[manager alloc]init];
-    }
-    
-    _managers.delegate = self;
-    
-    [_managers getChannelList];
+    [manager sharedManager].delegate = self;
+    [[manager sharedManager] getChannelList];
     // Do any additional setup after loading the view.
 }
 
@@ -62,8 +56,7 @@
 {
     NSDictionary *channelDic = [_ListArray objectAtIndex:indexPath.row];
     NSString *channel = [NSString stringWithFormat:@"%@",[channelDic objectForKey:@"channel_id"]];
-    [[NSUserDefaults standardUserDefaults] setObject:channel forKey:@"channel"];
-//    [self performSegueWithIdentifier:@"back" sender:self];
+    [manager sharedManager].channel = channel;
     [self.navigationController popViewControllerAnimated:YES];
 }
 

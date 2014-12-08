@@ -10,16 +10,15 @@
 
 @protocol managerDelegate <NSObject>
 @optional
-
 -(void)musicInfo:(NSDictionary *)dic;
 -(void)music:(NSData *)data;
 -(void)channelList:(NSDictionary *)dic;
 @end
 
 @interface manager : NSObject
-
 @property(nonatomic, strong)NSString *channel;
 @property(nonatomic, assign)id<managerDelegate>delegate;
++(manager *)sharedManager;
 -(void)getMusicList;
 -(void)downloadMusic:(NSString *)url;
 -(void)getChannelList;

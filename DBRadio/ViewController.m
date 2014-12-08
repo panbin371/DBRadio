@@ -7,18 +7,15 @@
 //
 
 #import "ViewController.h"
-#import "manager.h"
-#import "ListViewController.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UIImageView *musicImage;
 @property (weak, nonatomic) IBOutlet UITableView *musicTableView;
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
-@property (weak, nonatomic) NSTimer *musicTime;
+//@property (weak, nonatomic) NSTimer *musicTime;
 @property (strong, nonatomic)manager *managers;
 @property (strong, nonatomic)NSMutableArray *musicInfo;
-@property (strong, nonatomic)AVAudioPlayer *player;
 @property (assign, nonatomic)NSIndexPath *musicRow;
 @property (strong, nonatomic)NSDictionary *musicDic;
 @end
@@ -28,23 +25,26 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:YES];
-    _managers.channel = [[NSUserDefaults standardUserDefaults] objectForKey:@"channel"];
-    [_managers getMusicList];
+    [manager sharedManager].delegate = self;
+    [[manager sharedManager] getMusicList];
     _musicDic = [_musicInfo objectAtIndex:0];
-    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
     
-    _musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(time) userInfo:nil repeats:YES];
-    self.progress.progress = 0;
-    [self performSelectorInBackground:@selector(task) withObject:nil];
-//    dispatch_async(getDataQueue,^{
-//        //获取数据,获得一组后,刷新UI.
-//        dispatch_aysnc (mainQueue, ^{
-//            //UI的更新需在主线程中进行
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//       
+//        UIImage *img = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
+//        
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            _musicImage.image = img;
 //        });
 //    });
 
+    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
     
+    self.progress.progress = 0;
     
+    NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
+    [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
+    [self tableView:_musicTableView didSelectRowAtIndexPath:index];
 }
 
 - (void)viewDidLoad
@@ -52,20 +52,8 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBarHidden = YES;
-    if (_managers == nil)
-    {
-        _managers = [[manager alloc]init];
-        _managers.channel = @"0";
-    }
-    _managers.delegate = self;
 
-    _musicTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     // Do any additional setup after loading the view, typically from a nib.
-}
-
-- (void)task
-{
-    [_managers downloadMusic:[_musicDic objectForKey:@"url"]];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -92,7 +80,7 @@
     {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     NSDictionary *musicDic = [_musicInfo objectAtIndex:indexPath.row];
     cell.textLabel.text = [musicDic objectForKey:@"title"];
@@ -102,14 +90,26 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if(indexPath == _musicRow)
+    {
+        return;
+    }
     _musicRow = indexPath;
     _musicDic = [_musicInfo objectAtIndex:indexPath.row];
     _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
     
-    _musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(time) userInfo:nil repeats:YES];
+//    _musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(time) userInfo:nil repeats:YES];
     self.progress.progress = 0;
-    [self.player stop];
-    [self performSelectorInBackground:@selector(task) withObject:nil];
+    [[PlayMusic sharedPlay].player stop];
+    [PlayMusic sharedPlay].delegate = self;
+    dispatch_queue_t serialQueue = dispatch_queue_create("MusicQueue", NULL);
+    dispatch_async(serialQueue,^{
+        //获取数据,获得一组后,刷新UI.
+        [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"]];
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            //UI的更新需在主线程中进行
+//        });
+    });
 
 }
 
@@ -117,58 +117,35 @@
 {
     _musicInfo = [dic objectForKey:@"song"];
     [_musicTableView reloadData];
-}
-
--(void)music:(NSData *)data
-{
-    AVAudioPlayer *player = [[AVAudioPlayer alloc]initWithData:data error:nil];
-    _player = player;
-    [_player prepareToPlay];
-    _player.delegate = self;
-//    self.player.numberOfLoops = -1;
-    [_player play];
+    [manager sharedManager].delegate = [PlayMusic sharedPlay];
 }
 
 - (IBAction)stopOrPlay:(id)sender
 {
-    if (self.player.playing)
+    if ([PlayMusic sharedPlay].player.playing)
     {
-        [self.player pause];
+        [[PlayMusic sharedPlay].player pause];
     }
     else
     {
-        [self.player play];
+        [[PlayMusic sharedPlay].player play];
     }
 }
 
 - (IBAction)changeList:(id)sender
 {
-    [_player stop];
-//    
-//    ListViewController *list = [[ListViewController alloc]init];
-//    [self.navigationController pushViewController:list animated:YES];
+    [[PlayMusic sharedPlay].player stop];
 }
 
--(void)time
+-(void)timeChanged:(NSString *)time persent:(float)persent
 {
-    NSTimeInterval totalTimer = self.player.duration;
-    NSTimeInterval currentTime = self.player.currentTime;
-    self.progress.progress = (currentTime/totalTimer);
-    
-    NSTimeInterval totalmin = (int)totalTimer/60;
-    NSTimeInterval totals = (int)totalTimer%60;
-    
-    NSTimeInterval currentmin = (int)currentTime/60;
-    NSTimeInterval currents = (int)currentTime%60;
-    
-    NSString *time = [NSString stringWithFormat:@"%02.0f:%02.0f/%02.0f:%02.0f",currentmin,currents,totalmin,totals];
+    self.progress.progress = persent;
     self.timeLabel.text = time;
 }
 
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+- (void)nextMusic
 {
-    NSLog(@"%d",flag);
-    if (flag && _musicRow.row < [_musicInfo count] - 1)//播放下一首
+    if (_musicRow.row < [_musicInfo count] - 1)//播放下一首
     {
         NSIndexPath *index = [NSIndexPath indexPathForRow:_musicRow.row+1 inSection:_musicRow.section];
         [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];

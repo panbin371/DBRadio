@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2157EFBA1A317A5C008D5CFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2157EFB81A317A5C008D5CFE /* Main.storyboard */; };
 		2157EFBD1A317BCB008D5CFE /* ListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2157EFBC1A317BCB008D5CFE /* ListViewController.m */; };
+		21ABD6EB1A32A85100D87112 /* PlayMusic.m in Sources */ = {isa = PBXBuildFile; fileRef = 21ABD6EA1A32A85100D87112 /* PlayMusic.m */; };
 		21BBDE581A300CE90018FDB6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 21BBDE571A300CE90018FDB6 /* main.m */; };
 		21BBDE5B1A300CE90018FDB6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 21BBDE5A1A300CE90018FDB6 /* AppDelegate.m */; };
 		21BBDE5E1A300CE90018FDB6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21BBDE5D1A300CE90018FDB6 /* ViewController.m */; };
@@ -32,6 +33,8 @@
 		2157EFB91A317A5C008D5CFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2157EFBB1A317BCB008D5CFE /* ListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListViewController.h; sourceTree = "<group>"; };
 		2157EFBC1A317BCB008D5CFE /* ListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListViewController.m; sourceTree = "<group>"; };
+		21ABD6E91A32A85100D87112 /* PlayMusic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayMusic.h; sourceTree = "<group>"; };
+		21ABD6EA1A32A85100D87112 /* PlayMusic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayMusic.m; sourceTree = "<group>"; };
 		21BBDE521A300CE90018FDB6 /* DBRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DBRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		21BBDE561A300CE90018FDB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		21BBDE571A300CE90018FDB6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -66,6 +69,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2157EFDC1A31DA77008D5CFE /* View */ = {
+			isa = PBXGroup;
+			children = (
+				2157EFB81A317A5C008D5CFE /* Main.storyboard */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		2157EFDD1A31DA83008D5CFE /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				21BBDE5C1A300CE90018FDB6 /* ViewController.h */,
+				21BBDE5D1A300CE90018FDB6 /* ViewController.m */,
+				2157EFBB1A317BCB008D5CFE /* ListViewController.h */,
+				2157EFBC1A317BCB008D5CFE /* ListViewController.m */,
+			);
+			name = ViewController;
+			sourceTree = "<group>";
+		};
+		2157EFDE1A31DAA0008D5CFE /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				21BBDE8B1A3032C80018FDB6 /* manager.h */,
+				21BBDE8C1A3032C80018FDB6 /* manager.m */,
+				21ABD6E91A32A85100D87112 /* PlayMusic.h */,
+				21ABD6EA1A32A85100D87112 /* PlayMusic.m */,
+			);
+			name = Manager;
+			sourceTree = "<group>";
+		};
 		21BBDE491A300CE90018FDB6 = {
 			isa = PBXGroup;
 			children = (
@@ -87,11 +120,9 @@
 		21BBDE541A300CE90018FDB6 /* DBRadio */ = {
 			isa = PBXGroup;
 			children = (
-				21BBDE5C1A300CE90018FDB6 /* ViewController.h */,
-				21BBDE5D1A300CE90018FDB6 /* ViewController.m */,
-				2157EFBB1A317BCB008D5CFE /* ListViewController.h */,
-				2157EFBC1A317BCB008D5CFE /* ListViewController.m */,
-				2157EFB81A317A5C008D5CFE /* Main.storyboard */,
+				2157EFDE1A31DAA0008D5CFE /* Manager */,
+				2157EFDC1A31DA77008D5CFE /* View */,
+				2157EFDD1A31DA83008D5CFE /* ViewController */,
 				21BBDE621A300CE90018FDB6 /* Images.xcassets */,
 				21BBDE641A300CE90018FDB6 /* LaunchScreen.xib */,
 				21BBDE551A300CE90018FDB6 /* Supporting Files */,
@@ -131,8 +162,6 @@
 		21BBDE8E1A3032CF0018FDB6 /* manager */ = {
 			isa = PBXGroup;
 			children = (
-				21BBDE8B1A3032C80018FDB6 /* manager.h */,
-				21BBDE8C1A3032C80018FDB6 /* manager.m */,
 			);
 			name = manager;
 			sourceTree = "<group>";
@@ -238,6 +267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2157EFBD1A317BCB008D5CFE /* ListViewController.m in Sources */,
+				21ABD6EB1A32A85100D87112 /* PlayMusic.m in Sources */,
 				21BBDE5E1A300CE90018FDB6 /* ViewController.m in Sources */,
 				21BBDE5B1A300CE90018FDB6 /* AppDelegate.m in Sources */,
 				21BBDE581A300CE90018FDB6 /* main.m in Sources */,
