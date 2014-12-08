@@ -7,7 +7,8 @@
 //
 
 #import "manager.h"
-
+#import "AFHTTPRequestOperation.h"
+#import "AFHTTPRequestOperationManager.h"
 @implementation manager
 
 static manager *Manager = nil;
@@ -47,19 +48,32 @@ static manager *Manager = nil;
 
 -(void)downloadMusic:(NSString *)url
 {
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
-    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
-    [NSURLConnection sendAsynchronousRequest:request
-                                       queue:queue
-                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-                               if (error) {
-                                   NSLog(@"Httperror:%@%ld", error.localizedDescription,(long)error.code);
-                               }else{
-                                   NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
-                                   NSLog(@"HttpResponseCode:%ld", (long)responseCode);
-                                   [_delegate music:data];
-                               }
-                           }];
+    NSString *requestUrl = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURLRequest *request = [[NSURLRequest alloc]initWithURL:[NSURL URLWithString:requestUrl]];
+    
+    
+    
+    AFHTTPRequestOperation *operations = [[AFHTTPRequestOperation alloc]initWithRequest:request];
+    [operations setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"Success: %@", operation.response);
+        [_delegate music:operation.responseData];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"faile:%@",operation.responseString);
+    }];
+    [operations start];
+    
+//    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
+//    [NSURLConnection sendAsynchronousRequest:request
+//                                       queue:queue
+//                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+//                               if (error) {
+//                                   NSLog(@"Httperror:%@%ld", error.localizedDescription,(long)error.code);
+//                               }else{
+//                                   NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
+//                                   NSLog(@"HttpResponseCode:%ld", (long)responseCode);
+//                                   [_delegate music:data];
+//                               }
+//                           }];
 }
 
 -(NSString *)getMusicUrl
@@ -72,12 +86,23 @@ static manager *Manager = nil;
 {
     NSString *url = [NSString stringWithFormat:@"http://www.douban.com/j/app/radio/channels"];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
-    NSURLResponse *response = nil;
-    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-    if (responseData)
-    {
-        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:nil];
+    AFHTTPRequestOperation *opreation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
+    [opreation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+//        NSLog(@"success:%@",opreation.responseString);
+        NSString *str = [NSString stringWithString:operation.responseString];
+        NSData *data = [[NSData alloc]initWithData:[str dataUsingEncoding:NSUTF8StringEncoding]];
+        NSDictionary *dic  = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
         [_delegate channelList:dic];
-    }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+    }];
+    [opreation start];
+//    NSURLResponse *response = nil;
+//    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+//    if (responseData)
+//    {
+//        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:nil];
+//        [_delegate channelList:dic];
+//    }
 }
 @end

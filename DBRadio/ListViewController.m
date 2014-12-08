@@ -63,6 +63,7 @@
 -(void)channelList:(NSDictionary *)dic
 {
     _ListArray = [NSArray arrayWithArray:[dic objectForKey:@"channels"]];
+    [_ListTableView reloadData];
 }
 
 @end
