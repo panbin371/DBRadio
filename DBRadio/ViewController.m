@@ -40,8 +40,10 @@
 
 //    _musicImage.image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:[_musicDic objectForKey:@"picture"]]]];
     
-    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
+//    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
     
+    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
+    [thread start];
     
     self.progress.progress = 0;
     
@@ -126,7 +128,8 @@
 ////            //UI的更新需在主线程中进行
 ////        });
 //    });
-    [self performSelectorInBackground:@selector(downLoadMic) withObject:nil];
+//    [self performSelectorInBackground:@selector(downLoadMic) withObject:nil];
+    [NSThread detachNewThreadSelector:@selector(downLoadMic) toTarget:self withObject:nil];
 }
 
 - (void)downLoadMic
