@@ -150,7 +150,7 @@ static manager *Manager = nil;
         sqlite3_stmt *statement;
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil))
         {
-            
+            //
         }
     }
 }
