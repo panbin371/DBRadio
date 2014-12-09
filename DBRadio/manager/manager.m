@@ -9,6 +9,11 @@
 #import "manager.h"
 #import "AFHTTPRequestOperation.h"
 #import "AFHTTPRequestOperationManager.h"
+#import "PlayMusic.h"
+#import <sqlite3.h>
+
+#define KFileName @"data.sqlite3"
+
 @implementation manager
 
 static manager *Manager = nil;
@@ -35,15 +40,24 @@ static manager *Manager = nil;
 {
     NSString *url = [self getMusicUrl];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
-    [request setHTTPMethod:@"GET"];
-    NSHTTPURLResponse *response = nil;
-    NSError *error = [[NSError alloc]init];
-    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    if (responseData)
-    {
-        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSData *data = [[NSData alloc]initWithData:[operation.responseString dataUsingEncoding:NSUTF8StringEncoding]];
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
         [_delegate musicInfo:dic];
-    }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+    }];
+    [operation start];
+//    [request setHTTPMethod:@"GET"];
+//    NSHTTPURLResponse *response = nil;
+//    NSError *error = [[NSError alloc]init];
+//    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+//    if (responseData)
+//    {
+//        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
+//        [_delegate musicInfo:dic];
+//    }
 }
 
 -(void)downloadMusic:(NSString *)url
@@ -51,17 +65,17 @@ static manager *Manager = nil;
     NSString *requestUrl = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:[NSURL URLWithString:requestUrl]];
     
-    
-    
-    AFHTTPRequestOperation *operations = [[AFHTTPRequestOperation alloc]initWithRequest:request];
-    [operations setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSLog(@"Success: %@", operation.response);
-        [_delegate music:operation.responseData];
+        if (_delegate == [PlayMusic sharedPlay]) {
+            [_delegate music:operation.responseData];
+        }
+        
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"faile:%@",operation.responseString);
     }];
-    [operations start];
-    
+    [operation start];
 //    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
 //    [NSURLConnection sendAsynchronousRequest:request
 //                                       queue:queue
@@ -104,5 +118,40 @@ static manager *Manager = nil;
 //        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:nil];
 //        [_delegate channelList:dic];
 //    }
+}
+
+- (NSString *)dataFilePath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths firstObject];
+    return [documentDirectory stringByAppendingPathComponent:KFileName];
+}
+
+- (void)savData
+{
+    NSString *filePath = [self dataFilePath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath])
+    {
+        sqlite3 *database;
+        
+        if (sqlite3_open([filePath UTF8String], &database) != SQLITE_OK) {
+            sqlite3_close(database);
+            NSAssert(0, @"Failed to open database"); 
+        }
+        
+        char *errorMsg;
+        NSString *createSQL = @"CREATE TABLE IF NOT EXISTS FIELDS(ROW INTEGER PRIMARY KEY,FIELD_DATA TEXT);";
+        if (sqlite3_exec(database, [createSQL UTF8String], NULL, NULL, &errorMsg) != SQLITE_OK) {
+            sqlite3_close(database);
+            NSAssert(0, @"Error creating table: %s", errorMsg);
+        }
+        
+        NSString *query = @"SELECT ROW,FIELD_DATA FROM FIELDS ORDER BY ROW";
+        sqlite3_stmt *statement;
+        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil))
+        {
+            
+        }
+    }
 }
 @end

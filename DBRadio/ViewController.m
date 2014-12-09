@@ -27,7 +27,7 @@
     [super viewWillAppear:YES];
     [manager sharedManager].delegate = self;
     [[manager sharedManager] getMusicList];
-    _musicDic = [_musicInfo objectAtIndex:0];
+//    _musicDic = [_musicInfo objectAtIndex:0];
     
 //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 //       
@@ -45,15 +45,15 @@
 //    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
 //    [thread start];
     
-    NSInvocationOperation *opera = [[NSInvocationOperation alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
-    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
-    [queue addOperation:opera];
+//    NSInvocationOperation *opera = [[NSInvocationOperation alloc]initWithTarget:self selector:@selector(downLoadImg) object:nil];
+//    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
+//    [queue addOperation:opera];
+//    
+//    self.progress.progress = 0;
     
-    self.progress.progress = 0;
-    
-    NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
-    [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
-    [self tableView:_musicTableView didSelectRowAtIndexPath:index];
+//    NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
+//    [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
+//    [self tableView:_musicTableView didSelectRowAtIndexPath:index];
 }
 
 - (void)downLoadImg
@@ -145,7 +145,13 @@
 {
     _musicInfo = [dic objectForKey:@"song"];
     [_musicTableView reloadData];
+    _musicDic = [_musicInfo objectAtIndex:0];
+    [self performSelectorInBackground:@selector(downLoadImg) withObject:nil];
     [manager sharedManager].delegate = [PlayMusic sharedPlay];
+    NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
+    [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
+    [self tableView:_musicTableView didSelectRowAtIndexPath:index];
+    _musicRow = nil;
 }
 
 - (IBAction)stopOrPlay:(id)sender
