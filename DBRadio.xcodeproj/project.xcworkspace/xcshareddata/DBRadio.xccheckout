@@ -10,6 +10,8 @@
 	<string>DBRadio</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>04101981B66E318109934C9516F88D824BB96459</key>
+		<string>https://github.com/ccgus/fmdb.git</string>
 		<key>404B2FDAB8417D449E5C66439D0945240B563BF7</key>
 		<string>https://github.com/panbin371/DBRadio.git</string>
 	</dict>
@@ -17,6 +19,8 @@
 	<string>DBRadio.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>04101981B66E318109934C9516F88D824BB96459</key>
+		<string>../../../fmdb</string>
 		<key>404B2FDAB8417D449E5C66439D0945240B563BF7</key>
 		<string>../..</string>
 	</dict>
@@ -35,6 +39,14 @@
 			<string>404B2FDAB8417D449E5C66439D0945240B563BF7</string>
 			<key>IDESourceControlWCCName</key>
 			<string>DBRadio</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>04101981B66E318109934C9516F88D824BB96459</string>
+			<key>IDESourceControlWCCName</key>
+			<string>fmdb</string>
 		</dict>
 	</array>
 </dict>

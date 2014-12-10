@@ -74,6 +74,7 @@
     
     self.navigationController.navigationBarHidden = YES;
 
+    [[manager sharedManager] saveData];
     // Do any additional setup after loading the view, typically from a nib.
 }
 

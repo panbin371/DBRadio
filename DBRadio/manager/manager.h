@@ -22,4 +22,5 @@
 -(void)getMusicList;
 -(void)downloadMusic:(NSString *)url;
 -(void)getChannelList;
+-(void)saveData;
 @end

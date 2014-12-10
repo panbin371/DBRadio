@@ -10,7 +10,7 @@
 #import "AFHTTPRequestOperation.h"
 #import "AFHTTPRequestOperationManager.h"
 #import "PlayMusic.h"
-#import <sqlite3.h>
+#import "FMDatabase.h"
 
 #define KFileName @"data.sqlite3"
 
@@ -127,31 +127,12 @@ static manager *Manager = nil;
     return [documentDirectory stringByAppendingPathComponent:KFileName];
 }
 
-- (void)savData
+- (void)saveData
 {
     NSString *filePath = [self dataFilePath];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath])
-    {
-        sqlite3 *database;
-        
-        if (sqlite3_open([filePath UTF8String], &database) != SQLITE_OK) {
-            sqlite3_close(database);
-            NSAssert(0, @"Failed to open database"); 
-        }
-        
-        char *errorMsg;
-        NSString *createSQL = @"CREATE TABLE IF NOT EXISTS FIELDS(ROW INTEGER PRIMARY KEY,FIELD_DATA TEXT);";
-        if (sqlite3_exec(database, [createSQL UTF8String], NULL, NULL, &errorMsg) != SQLITE_OK) {
-            sqlite3_close(database);
-            NSAssert(0, @"Error creating table: %s", errorMsg);
-        }
-        
-        NSString *query = @"SELECT ROW,FIELD_DATA FROM FIELDS ORDER BY ROW";
-        sqlite3_stmt *statement;
-        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil))
-        {
-            //
-        }
+    FMDatabase *db = [FMDatabase databaseWithPath:filePath];
+    if (![db open]) {
+        NSLog(@"Failed to open");
     }
 }
 @end
