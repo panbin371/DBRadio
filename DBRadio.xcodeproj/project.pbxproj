@@ -232,7 +232,6 @@
 				21BBDE621A300CE90018FDB6 /* Images.xcassets */,
 				21BBDE641A300CE90018FDB6 /* LaunchScreen.xib */,
 				21BBDE551A300CE90018FDB6 /* Supporting Files */,
-				21BBDE8E1A3032CF0018FDB6 /* manager */,
 			);
 			path = DBRadio;
 			sourceTree = "<group>";
@@ -263,13 +262,6 @@
 				21BBDE701A300CE90018FDB6 /* Info.plist */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		21BBDE8E1A3032CF0018FDB6 /* manager */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = manager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -516,9 +508,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer: epro epro (TY4EN94SRV)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: epro epro (TY4EN94SRV)";
 				INFOPLIST_FILE = DBRadio/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "d2c4be7a-20a4-4d91-b3a1-9fad86a67069";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -527,9 +522,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer: epro epro (TY4EN94SRV)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: epro epro (TY4EN94SRV)";
 				INFOPLIST_FILE = DBRadio/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "d2c4be7a-20a4-4d91-b3a1-9fad86a67069";
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
