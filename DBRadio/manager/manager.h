@@ -20,7 +20,7 @@
 @property(nonatomic, assign)id<managerDelegate>delegate;
 +(manager *)sharedManager;
 -(void)getMusicList;
--(void)downloadMusic:(NSString *)url;
+-(void)downloadMusic:(NSString *)url name:(NSString *)name;
 -(void)getChannelList;
--(void)saveData;
+- (void)saveData:(NSData *)data name:(NSString *)name;
 @end

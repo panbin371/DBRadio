@@ -60,8 +60,18 @@ static manager *Manager = nil;
 //    }
 }
 
--(void)downloadMusic:(NSString *)url
+-(void)downloadMusic:(NSString *)url name:(NSString *)name
 {
+    NSData *data = [self checkMusicDataByName:name];
+    if (data)
+    {
+        if(_delegate == [PlayMusic sharedPlay])
+        {
+            [_delegate music:data];
+            return;
+        }
+    }
+    
     NSString *requestUrl = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURLRequest *request = [[NSURLRequest alloc]initWithURL:[NSURL URLWithString:requestUrl]];
     
@@ -70,6 +80,8 @@ static manager *Manager = nil;
         NSLog(@"Success: %@", operation.response);
         if (_delegate == [PlayMusic sharedPlay]) {
             [_delegate music:operation.responseData];
+            
+            [self saveData:operation.responseData name:name];
         }
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -122,17 +134,76 @@ static manager *Manager = nil;
 
 - (NSString *)dataFilePath
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentationDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentDirectory = [paths firstObject];
     return [documentDirectory stringByAppendingPathComponent:KFileName];
 }
 
-- (void)saveData
+- (void)saveData:(NSData *)data name:(NSString *)name
 {
     NSString *filePath = [self dataFilePath];
     FMDatabase *db = [FMDatabase databaseWithPath:filePath];
-    if (![db open]) {
+    if (![db open])
+    {
         NSLog(@"Failed to open");
     }
+    
+    NSString *createStr = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS '%@'('%@' TEXT, '%@' DATA)",@"Music",@"MusicName",@"MusicData"];
+    if (![db executeUpdate:createStr])
+    {
+        NSLog(@"Failed to create");
+    }
+
+//    NSString *insertStr = [NSString stringWithFormat:@"INSERT INTO MUSIC VALUES MusicName = ?,MusicData = ?",name,data];
+    if (![db executeUpdate:@"INSERT INTO Music(MusicName,MusicData) VALUES (?,?)",name,data]) {
+        NSLog(@"Failed to insert");
+    }
+//    NSString *createStr = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS '%@'('%@' TEXT)",@"List",@"Name"];
+//    if (![db executeUpdate:createStr])
+//    {
+//        NSLog(@"Failed to create");
+//    }
+//
+//    NSString *insertStr = [NSString stringWithFormat:@"INSERT INTO List VALUES ('jack')"];
+//    if (![db executeUpdate:insertStr])
+//    {
+//        NSLog(@"Failed to insert");
+//    }
+//    
+//    NSString *selectStr = [NSString stringWithFormat:@"SELECT * FROM List"];
+//    FMResultSet *result = [db executeQuery:selectStr];
+//    while ([result next])
+//    {
+//        NSLog(@"%@",[result stringForColumn:@"Name"]);
+//    }
+//    
+//    NSString *deleteStr = [NSString stringWithFormat:@"DELETE FROM List WHERE Name = 'jack'"];
+//    if (![db executeUpdate:deleteStr])
+//    {
+//        NSLog(@"Failed to delete");
+//    }
+    
+    [db close];
+}
+
+- (NSData *)checkMusicDataByName:(NSString *)name
+{
+    NSData *data = nil;
+    NSString *filePath = [self dataFilePath];
+    FMDatabase *db = [FMDatabase databaseWithPath:filePath];
+    if (![db open])
+    {
+        NSLog(@"Failed to open");
+    }
+    
+    NSString *selectStr = [NSString stringWithFormat:@"SELECT MusicData FROM Music WHERE MusicName = ?",name];
+    FMResultSet *result = [db executeQuery:selectStr];
+    while ([result next])
+    {
+        data = [result dataForColumn:@"MusicData"];
+    }
+    
+    [db close];
+    return data;
 }
 @end

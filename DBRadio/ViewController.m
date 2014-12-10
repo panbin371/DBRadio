@@ -16,7 +16,7 @@
 //@property (weak, nonatomic) NSTimer *musicTime;
 @property (strong, nonatomic)manager *managers;
 @property (strong, nonatomic)NSMutableArray *musicInfo;
-@property (assign, nonatomic)NSIndexPath *musicRow;
+@property (strong, nonatomic)NSIndexPath *musicRow;
 @property (strong, nonatomic)NSDictionary *musicDic;
 @end
 
@@ -74,7 +74,6 @@
     
     self.navigationController.navigationBarHidden = YES;
 
-    [[manager sharedManager] saveData];
     // Do any additional setup after loading the view, typically from a nib.
 }
 
@@ -139,7 +138,7 @@
 
 - (void)downLoadMic
 {
-    [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"]];
+    [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"] name:[_musicDic objectForKey:@"title"]];
 }
 
 -(void)musicInfo:(NSDictionary *)dic
@@ -152,7 +151,7 @@
     NSIndexPath *index = [NSIndexPath indexPathForRow:0 inSection:0];
     [_musicTableView selectRowAtIndexPath:index animated:NO scrollPosition:UITableViewScrollPositionNone];
     [self tableView:_musicTableView didSelectRowAtIndexPath:index];
-    _musicRow = nil;
+//    _musicRow = nil;
 }
 
 - (IBAction)stopOrPlay:(id)sender
@@ -180,6 +179,7 @@
 
 - (void)nextMusic
 {
+    NSLog(@"%d",(int)_musicRow.row);
     if (_musicRow.row < [_musicInfo count] - 1)//播放下一首
     {
         NSIndexPath *index = [NSIndexPath indexPathForRow:_musicRow.row+1 inSection:_musicRow.section];

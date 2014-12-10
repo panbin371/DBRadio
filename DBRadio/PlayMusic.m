@@ -54,6 +54,10 @@ static PlayMusic *players = nil;
     players.player.delegate = self;
 //    self.player.numberOfLoops = -1;
     [players.player play];
+    
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setActive:YES error:nil];
+    [session setCategory:AVAudioSessionCategoryPlayback error:nil];
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
