@@ -179,7 +179,6 @@
 
 - (void)nextMusic
 {
-    NSLog(@"%d",(int)_musicRow.row);
     if (_musicRow.row < [_musicInfo count] - 1)//播放下一首
     {
         NSIndexPath *index = [NSIndexPath indexPathForRow:_musicRow.row+1 inSection:_musicRow.section];

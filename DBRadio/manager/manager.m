@@ -77,7 +77,7 @@ static manager *Manager = nil;
     
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"Success: %@", operation.response);
+//        NSLog(@"Success: %@", operation.response);
         if (_delegate == [PlayMusic sharedPlay]) {
             [_delegate music:operation.responseData];
             
@@ -196,8 +196,7 @@ static manager *Manager = nil;
         NSLog(@"Failed to open");
     }
     
-    NSString *selectStr = [NSString stringWithFormat:@"SELECT MusicData FROM Music WHERE MusicName = ?",name];
-    FMResultSet *result = [db executeQuery:selectStr];
+    FMResultSet *result = [db executeQuery:@"SELECT MusicData FROM Music WHERE MusicName = ?",name];
     while ([result next])
     {
         data = [result dataForColumn:@"MusicData"];
