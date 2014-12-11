@@ -26,7 +26,7 @@
 {
     [super viewWillAppear:YES];
     [manager sharedManager].delegate = self;
-    [[manager sharedManager] getMusicList];
+    [[manager sharedManager] getMusicListByAFHTTPRequestOperation];
 //    _musicDic = [_musicInfo objectAtIndex:0];
     
 //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -138,7 +138,7 @@
 
 - (void)downLoadMic
 {
-    [[manager sharedManager] downloadMusic:[_musicDic objectForKey:@"url"] name:[_musicDic objectForKey:@"title"]];
+    [[manager sharedManager] downloadMusicByAFHTTPRequestOperation:[_musicDic objectForKey:@"url"] name:[_musicDic objectForKey:@"title"]];
 }
 
 -(void)musicInfo:(NSDictionary *)dic

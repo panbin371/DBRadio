@@ -19,7 +19,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [manager sharedManager].delegate = self;
-    [[manager sharedManager] getChannelList];
+    [[manager sharedManager] getChannelListByAFHTTPRequestOperation];
     // Do any additional setup after loading the view.
 }
 

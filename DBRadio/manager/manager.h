@@ -10,17 +10,29 @@
 
 @protocol managerDelegate <NSObject>
 @optional
+
 -(void)musicInfo:(NSDictionary *)dic;
 -(void)music:(NSData *)data;
 -(void)channelList:(NSDictionary *)dic;
+
 @end
 
 @interface manager : NSObject
+
 @property(nonatomic, strong)NSString *channel;
 @property(nonatomic, assign)id<managerDelegate>delegate;
+
 +(manager *)sharedManager;
--(void)getMusicList;
--(void)downloadMusic:(NSString *)url name:(NSString *)name;
--(void)getChannelList;
+
+-(void)getMusicListByAFHTTPRequestOperation;
+-(void)getMusicListByNSURLConnection;
+
+-(void)downloadMusicByAFHTTPRequestOperation:(NSString *)url name:(NSString *)name;
+-(void)downloadMusicByNSURLConnection:(NSString *)url name:(NSString *)name;
+
+-(void)getChannelListByAFHTTPRequestOperation;
+-(void)getChannelListByNSURLConnection;
+
 - (void)saveData:(NSData *)data name:(NSString *)name;
+
 @end

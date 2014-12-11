@@ -25,22 +25,22 @@ static manager *Manager = nil;
         Manager.channel = [NSString stringWithFormat:@"0"];
     });
     
-//    @synchronized(self)
-//    {
-//        if (Manager == nil)
-//        {
-//            Manager = [[manager alloc]init];
-//            Manager.channel = [NSString stringWithFormat:@"0"];
-//        }
-//    }
     return Manager;
 }
 
-- (void)getMusicList
+-(NSString *)getMusicUrl
+{
+    NSLog(@"%@",_channel);
+    return [NSString stringWithFormat:@"http://douban.fm/j/mine/playlist?channel=%@",_channel];
+}
+
+- (void)getMusicListByAFHTTPRequestOperation
 {
     NSString *url = [self getMusicUrl];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
+    
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
+    
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSData *data = [[NSData alloc]initWithData:[operation.responseString dataUsingEncoding:NSUTF8StringEncoding]];
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
@@ -48,19 +48,28 @@ static manager *Manager = nil;
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         
     }];
+    
     [operation start];
-//    [request setHTTPMethod:@"GET"];
-//    NSHTTPURLResponse *response = nil;
-//    NSError *error = [[NSError alloc]init];
-//    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-//    if (responseData)
-//    {
-//        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
-//        [_delegate musicInfo:dic];
-//    }
 }
 
--(void)downloadMusic:(NSString *)url name:(NSString *)name
+- (void)getMusicListByNSURLConnection
+{
+    NSString *url = [self getMusicUrl];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
+    [request setHTTPMethod:@"GET"];
+    
+    NSHTTPURLResponse *response = nil;
+    NSError *error = [[NSError alloc]init];
+    
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (responseData)
+    {
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:&error];
+        [_delegate musicInfo:dic];
+    }
+}
+
+-(void)downloadMusicByAFHTTPRequestOperation:(NSString *)url name:(NSString *)name
 {
     NSData *data = [self checkMusicDataByName:name];
     if (data)
@@ -88,30 +97,43 @@ static manager *Manager = nil;
         NSLog(@"faile:%@",operation.responseString);
     }];
     [operation start];
-//    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
-//    [NSURLConnection sendAsynchronousRequest:request
-//                                       queue:queue
-//                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
-//                               if (error) {
-//                                   NSLog(@"Httperror:%@%ld", error.localizedDescription,(long)error.code);
-//                               }else{
-//                                   NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
-//                                   NSLog(@"HttpResponseCode:%ld", (long)responseCode);
-//                                   [_delegate music:data];
-//                               }
-//                           }];
 }
 
--(NSString *)getMusicUrl
+-(void)downloadMusicByNSURLConnection:(NSString *)url name:(NSString *)name
 {
-    NSLog(@"%@",_channel);
-    return [NSString stringWithFormat:@"http://douban.fm/j/mine/playlist?channel=%@",_channel];
+    NSData *data = [self checkMusicDataByName:name];
+    if (data)
+    {
+        if(_delegate == [PlayMusic sharedPlay])
+        {
+            [_delegate music:data];
+            return;
+        }
+    }
+    
+    NSString *requestUrl = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURLRequest *request = [[NSURLRequest alloc]initWithURL:[NSURL URLWithString:requestUrl]];
+    
+    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:queue
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+                               if (error) {
+                                   NSLog(@"Httperror:%@%ld", error.localizedDescription,(long)error.code);
+                               }else{
+                                   NSInteger responseCode = [(NSHTTPURLResponse *)response statusCode];
+                                   NSLog(@"HttpResponseCode:%ld", (long)responseCode);
+                                   [_delegate music:data];
+                               }
+                           }];
+
 }
 
--(void)getChannelList
+-(void)getChannelListByAFHTTPRequestOperation
 {
     NSString *url = [NSString stringWithFormat:@"http://www.douban.com/j/app/radio/channels"];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
+    
     AFHTTPRequestOperation *opreation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
     [opreation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
 //        NSLog(@"success:%@",opreation.responseString);
@@ -123,13 +145,21 @@ static manager *Manager = nil;
         
     }];
     [opreation start];
-//    NSURLResponse *response = nil;
-//    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-//    if (responseData)
-//    {
-//        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:nil];
-//        [_delegate channelList:dic];
-//    }
+}
+
+-(void)getChannelListByNSURLConnection
+{
+    NSString *url = [NSString stringWithFormat:@"http://www.douban.com/j/app/radio/channels"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]initWithURL:[NSURL URLWithString:url]];
+    
+    NSURLResponse *response = nil;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+    if (responseData)
+    {
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingMutableLeaves error:nil];
+        [_delegate channelList:dic];
+    }
+
 }
 
 - (NSString *)dataFilePath

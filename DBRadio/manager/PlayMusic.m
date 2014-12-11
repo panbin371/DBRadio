@@ -20,14 +20,6 @@ static PlayMusic *players = nil;
         players.musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:players selector:@selector(changeTime) userInfo:nil repeats:YES];
     });
     
-//    @synchronized(self)
-//    {
-//        if (players == nil)
-//        {
-//            players = [[PlayMusic alloc]init];
-//            players.musicTime = [NSTimer scheduledTimerWithTimeInterval:1 target:players selector:@selector(changeTime) userInfo:nil repeats:YES];
-//        }
-//    }
     return players;
 }
 
